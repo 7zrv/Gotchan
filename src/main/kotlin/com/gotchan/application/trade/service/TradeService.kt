@@ -1,6 +1,7 @@
 package com.gotchan.application.trade.service
 
 import com.gotchan.application.trade.dto.*
+import com.gotchan.application.trade.port.TradeUseCase
 import com.gotchan.common.exception.*
 import com.gotchan.domain.item.port.ItemRepository
 import com.gotchan.domain.trade.model.Trade
@@ -16,22 +17,20 @@ class TradeService(
     private val tradeRepository: TradeRepository,
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository
-) {
+) : TradeUseCase {
 
     @Transactional
-    fun requestTrade(command: RequestTradeCommand): TradeResponse {
+    override fun requestTrade(command: RequestTradeCommand): TradeResponse {
         val proposer = userRepository.findById(command.proposerId)
             ?: throw EntityNotFoundException("User", command.proposerId)
 
         val proposerItem = itemRepository.findById(command.proposerItemId)
             ?: throw EntityNotFoundException("Item", command.proposerItemId)
 
-        // 본인 소유 아이템인지 먼저 확인
         if (proposerItem.owner.id != proposer.id) {
             throw ForbiddenException("You are not the owner of this item")
         }
 
-        // 제안자 아이템 상태 확인
         if (!proposerItem.isAvailable()) {
             throw InvalidStateException("Proposer item is not available for trade")
         }
@@ -39,12 +38,10 @@ class TradeService(
         val receiverItem = itemRepository.findById(command.receiverItemId)
             ?: throw EntityNotFoundException("Item", command.receiverItemId)
 
-        // 자기 자신에게 교환 요청 불가
         if (receiverItem.owner.id == proposer.id) {
             throw BusinessException(ErrorCode.SELF_TRADE_NOT_ALLOWED)
         }
 
-        // 수신자 아이템 상태 확인
         if (!receiverItem.isAvailable()) {
             throw InvalidStateException("Receiver item is not available for trade")
         }
@@ -61,7 +58,7 @@ class TradeService(
     }
 
     @Transactional
-    fun respondTrade(command: RespondTradeCommand): TradeResponse {
+    override fun respondTrade(command: RespondTradeCommand): TradeResponse {
         val trade = tradeRepository.findById(command.tradeId)
             ?: throw EntityNotFoundException("Trade", command.tradeId)
 
@@ -80,7 +77,7 @@ class TradeService(
     }
 
     @Transactional
-    fun registerTracking(command: RegisterTrackingCommand): TradeResponse {
+    override fun registerTracking(command: RegisterTrackingCommand): TradeResponse {
         val trade = tradeRepository.findById(command.tradeId)
             ?: throw EntityNotFoundException("Trade", command.tradeId)
 
@@ -95,7 +92,7 @@ class TradeService(
     }
 
     @Transactional
-    fun confirmTrade(command: ConfirmTradeCommand): TradeResponse {
+    override fun confirmTrade(command: ConfirmTradeCommand): TradeResponse {
         val trade = tradeRepository.findById(command.tradeId)
             ?: throw EntityNotFoundException("Trade", command.tradeId)
 
@@ -110,7 +107,7 @@ class TradeService(
     }
 
     @Transactional
-    fun cancelTrade(command: CancelTradeCommand): TradeResponse {
+    override fun cancelTrade(command: CancelTradeCommand): TradeResponse {
         val trade = tradeRepository.findById(command.tradeId)
             ?: throw EntityNotFoundException("Trade", command.tradeId)
 
@@ -124,13 +121,13 @@ class TradeService(
         return TradeResponse.from(savedTrade)
     }
 
-    fun getTrade(tradeId: Long): TradeResponse {
+    override fun getTrade(tradeId: Long): TradeResponse {
         val trade = tradeRepository.findById(tradeId)
             ?: throw EntityNotFoundException("Trade", tradeId)
         return TradeResponse.from(trade)
     }
 
-    fun getTradesByUser(userId: UUID): List<TradeResponse> {
+    override fun getTradesByUser(userId: UUID): List<TradeResponse> {
         return tradeRepository.findByProposerIdOrReceiverId(userId)
             .map { TradeResponse.from(it) }
     }

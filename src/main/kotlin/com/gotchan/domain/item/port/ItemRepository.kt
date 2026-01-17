@@ -13,5 +13,6 @@ interface ItemRepository {
     fun findBySeriesName(seriesName: String): List<GachaItem>
     fun findBySeriesNameAndStatus(seriesName: String, status: ItemStatus): List<GachaItem>
     fun findAvailableByTypeAndSeriesName(type: ItemType, seriesName: String): List<GachaItem>
+    fun findAvailableByTypeAndSeriesNameAndItemName(type: ItemType, seriesName: String, itemName: String): List<GachaItem>
     fun delete(item: GachaItem)
 }

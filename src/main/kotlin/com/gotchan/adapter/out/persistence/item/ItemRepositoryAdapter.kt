@@ -31,5 +31,11 @@ class ItemRepositoryAdapter(
     override fun findAvailableByTypeAndSeriesName(type: ItemType, seriesName: String): List<GachaItem> =
         itemJpaRepository.findAvailableByTypeAndSeriesName(type, seriesName)
 
+    override fun findAvailableByTypeAndSeriesNameAndItemName(
+        type: ItemType,
+        seriesName: String,
+        itemName: String
+    ): List<GachaItem> = itemJpaRepository.findAvailableByTypeAndSeriesNameAndItemName(type, seriesName, itemName)
+
     override fun delete(item: GachaItem) = itemJpaRepository.delete(item)
 }

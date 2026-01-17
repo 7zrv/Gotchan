@@ -15,4 +15,7 @@ interface ItemJpaRepository : JpaRepository<GachaItem, Long> {
 
     @Query("SELECT i FROM GachaItem i WHERE i.type = :type AND i.seriesName = :seriesName AND i.status = 'AVAILABLE'")
     fun findAvailableByTypeAndSeriesName(type: ItemType, seriesName: String): List<GachaItem>
+
+    @Query("SELECT i FROM GachaItem i WHERE i.type = :type AND i.seriesName = :seriesName AND i.itemName = :itemName AND i.status = 'AVAILABLE'")
+    fun findAvailableByTypeAndSeriesNameAndItemName(type: ItemType, seriesName: String, itemName: String): List<GachaItem>
 }

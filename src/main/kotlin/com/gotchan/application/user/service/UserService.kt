@@ -4,6 +4,7 @@ import com.gotchan.application.user.dto.SignUpCommand
 import com.gotchan.application.user.dto.UpdateUserCommand
 import com.gotchan.application.user.dto.UserProfileResponse
 import com.gotchan.application.user.dto.UserResponse
+import com.gotchan.application.user.port.UserUseCase
 import com.gotchan.common.exception.DuplicateEntityException
 import com.gotchan.common.exception.EntityNotFoundException
 import com.gotchan.domain.user.model.User
@@ -16,10 +17,10 @@ import java.util.*
 @Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository
-) {
+) : UserUseCase {
 
     @Transactional
-    fun signUp(command: SignUpCommand): UserResponse {
+    override fun signUp(command: SignUpCommand): UserResponse {
         if (userRepository.existsByEmail(command.email)) {
             throw DuplicateEntityException("User", "email", command.email)
         }
@@ -37,20 +38,20 @@ class UserService(
         return UserResponse.from(savedUser)
     }
 
-    fun getProfile(userId: UUID): UserProfileResponse {
+    override fun getProfile(userId: UUID): UserProfileResponse {
         val user = userRepository.findById(userId)
             ?: throw EntityNotFoundException("User", userId)
         return UserProfileResponse.from(user)
     }
 
-    fun getUser(userId: UUID): UserResponse {
+    override fun getUser(userId: UUID): UserResponse {
         val user = userRepository.findById(userId)
             ?: throw EntityNotFoundException("User", userId)
         return UserResponse.from(user)
     }
 
     @Transactional
-    fun updateUser(command: UpdateUserCommand): UserProfileResponse {
+    override fun updateUser(command: UpdateUserCommand): UserProfileResponse {
         val user = userRepository.findById(command.userId)
             ?: throw EntityNotFoundException("User", command.userId)
 

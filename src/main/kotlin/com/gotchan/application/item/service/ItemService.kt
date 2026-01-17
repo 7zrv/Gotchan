@@ -4,6 +4,7 @@ import com.gotchan.application.item.dto.CreateItemCommand
 import com.gotchan.application.item.dto.DeleteItemCommand
 import com.gotchan.application.item.dto.ItemResponse
 import com.gotchan.application.item.dto.UpdateItemCommand
+import com.gotchan.application.item.port.ItemUseCase
 import com.gotchan.common.exception.EntityNotFoundException
 import com.gotchan.common.exception.ForbiddenException
 import com.gotchan.common.exception.InvalidStateException
@@ -19,10 +20,10 @@ import java.util.*
 class ItemService(
     private val itemRepository: ItemRepository,
     private val userRepository: UserRepository
-) {
+) : ItemUseCase {
 
     @Transactional
-    fun createItem(command: CreateItemCommand): ItemResponse {
+    override fun createItem(command: CreateItemCommand): ItemResponse {
         val owner = userRepository.findById(command.ownerId)
             ?: throw EntityNotFoundException("User", command.ownerId)
 
@@ -38,24 +39,24 @@ class ItemService(
         return ItemResponse.from(savedItem)
     }
 
-    fun getItem(itemId: Long): ItemResponse {
+    override fun getItem(itemId: Long): ItemResponse {
         val item = itemRepository.findById(itemId)
             ?: throw EntityNotFoundException("Item", itemId)
         return ItemResponse.from(item)
     }
 
-    fun getItemsByOwner(ownerId: UUID): List<ItemResponse> {
+    override fun getItemsByOwner(ownerId: UUID): List<ItemResponse> {
         return itemRepository.findByOwnerId(ownerId)
             .map { ItemResponse.from(it) }
     }
 
-    fun searchBySeries(seriesName: String): List<ItemResponse> {
+    override fun searchBySeries(seriesName: String): List<ItemResponse> {
         return itemRepository.findBySeriesName(seriesName)
             .map { ItemResponse.from(it) }
     }
 
     @Transactional
-    fun updateItem(command: UpdateItemCommand): ItemResponse {
+    override fun updateItem(command: UpdateItemCommand): ItemResponse {
         val item = itemRepository.findById(command.itemId)
             ?: throw EntityNotFoundException("Item", command.itemId)
 
@@ -76,7 +77,7 @@ class ItemService(
     }
 
     @Transactional
-    fun deleteItem(command: DeleteItemCommand) {
+    override fun deleteItem(command: DeleteItemCommand) {
         val item = itemRepository.findById(command.itemId)
             ?: throw EntityNotFoundException("Item", command.itemId)
 
