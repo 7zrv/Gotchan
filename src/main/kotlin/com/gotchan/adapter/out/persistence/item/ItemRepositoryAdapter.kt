@@ -10,32 +10,34 @@ import java.util.*
 
 @Repository
 class ItemRepositoryAdapter(
-    private val itemJpaRepository: ItemJpaRepository
+    private val itemJpaRepository: ItemJpaRepository,
+    private val itemQueryRepository: ItemQueryRepository
 ) : ItemRepository {
 
     override fun save(item: GachaItem): GachaItem = itemJpaRepository.save(item)
 
     override fun findById(id: Long): GachaItem? = itemJpaRepository.findByIdOrNull(id)
 
-    override fun findByOwnerId(ownerId: UUID): List<GachaItem> = itemJpaRepository.findByOwnerId(ownerId)
+    override fun findByOwnerId(ownerId: UUID): List<GachaItem> =
+        itemQueryRepository.findByOwnerId(ownerId)
 
     override fun findByOwnerIdAndType(ownerId: UUID, type: ItemType): List<GachaItem> =
-        itemJpaRepository.findByOwnerIdAndType(ownerId, type)
+        itemQueryRepository.findByOwnerIdAndType(ownerId, type)
 
     override fun findBySeriesName(seriesName: String): List<GachaItem> =
-        itemJpaRepository.findBySeriesName(seriesName)
+        itemQueryRepository.findBySeriesName(seriesName)
 
     override fun findBySeriesNameAndStatus(seriesName: String, status: ItemStatus): List<GachaItem> =
-        itemJpaRepository.findBySeriesNameAndStatus(seriesName, status)
+        itemQueryRepository.findBySeriesNameAndStatus(seriesName, status)
 
     override fun findAvailableByTypeAndSeriesName(type: ItemType, seriesName: String): List<GachaItem> =
-        itemJpaRepository.findAvailableByTypeAndSeriesName(type, seriesName)
+        itemQueryRepository.findAvailableByTypeAndSeriesName(type, seriesName)
 
     override fun findAvailableByTypeAndSeriesNameAndItemName(
         type: ItemType,
         seriesName: String,
         itemName: String
-    ): List<GachaItem> = itemJpaRepository.findAvailableByTypeAndSeriesNameAndItemName(type, seriesName, itemName)
+    ): List<GachaItem> = itemQueryRepository.findAvailableByTypeAndSeriesNameAndItemName(type, seriesName, itemName)
 
     override fun delete(item: GachaItem) = itemJpaRepository.delete(item)
 }

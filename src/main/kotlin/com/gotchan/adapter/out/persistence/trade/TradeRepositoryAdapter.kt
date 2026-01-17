@@ -9,7 +9,8 @@ import java.util.*
 
 @Repository
 class TradeRepositoryAdapter(
-    private val tradeJpaRepository: TradeJpaRepository
+    private val tradeJpaRepository: TradeJpaRepository,
+    private val tradeQueryRepository: TradeQueryRepository
 ) : TradeRepository {
 
     override fun save(trade: Trade): Trade = tradeJpaRepository.save(trade)
@@ -17,20 +18,20 @@ class TradeRepositoryAdapter(
     override fun findById(id: Long): Trade? = tradeJpaRepository.findByIdOrNull(id)
 
     override fun findByProposerId(proposerId: UUID): List<Trade> =
-        tradeJpaRepository.findByProposerId(proposerId)
+        tradeQueryRepository.findByProposerId(proposerId)
 
     override fun findByReceiverId(receiverId: UUID): List<Trade> =
-        tradeJpaRepository.findByReceiverId(receiverId)
+        tradeQueryRepository.findByReceiverId(receiverId)
 
     override fun findByProposerIdOrReceiverId(userId: UUID): List<Trade> =
-        tradeJpaRepository.findByProposerIdOrReceiverId(userId)
+        tradeQueryRepository.findByProposerIdOrReceiverId(userId)
 
     override fun findByStatus(status: TradeStatus): List<Trade> =
-        tradeJpaRepository.findByStatus(status)
+        tradeQueryRepository.findByStatus(status)
 
     override fun existsByProposerItemIdAndStatusIn(itemId: Long, statuses: List<TradeStatus>): Boolean =
-        tradeJpaRepository.existsByProposerItemIdAndStatusIn(itemId, statuses)
+        tradeQueryRepository.existsByProposerItemIdAndStatusIn(itemId, statuses)
 
     override fun existsByReceiverItemIdAndStatusIn(itemId: Long, statuses: List<TradeStatus>): Boolean =
-        tradeJpaRepository.existsByReceiverItemIdAndStatusIn(itemId, statuses)
+        tradeQueryRepository.existsByReceiverItemIdAndStatusIn(itemId, statuses)
 }
