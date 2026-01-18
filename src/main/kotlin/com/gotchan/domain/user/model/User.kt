@@ -38,13 +38,15 @@ class User(
     }
 
     fun increaseTrustScore(amount: BigDecimal) {
-        this.trustScore = this.trustScore.add(amount)
+        this.trustScore = (this.trustScore.add(amount)).min(MAX_TRUST_SCORE)
     }
 
     fun decreaseTrustScore(amount: BigDecimal) {
-        this.trustScore = this.trustScore.subtract(amount)
-        if (this.trustScore < BigDecimal.ZERO) {
-            this.trustScore = BigDecimal.ZERO
-        }
+        this.trustScore = (this.trustScore.subtract(amount)).max(MIN_TRUST_SCORE)
+    }
+
+    companion object {
+        val MAX_TRUST_SCORE: BigDecimal = BigDecimal("100.0")
+        val MIN_TRUST_SCORE: BigDecimal = BigDecimal.ZERO
     }
 }

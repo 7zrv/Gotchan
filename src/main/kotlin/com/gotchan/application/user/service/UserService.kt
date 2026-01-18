@@ -9,6 +9,7 @@ import com.gotchan.common.exception.DuplicateEntityException
 import com.gotchan.common.exception.EntityNotFoundException
 import com.gotchan.domain.user.model.User
 import com.gotchan.domain.user.port.UserRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -16,7 +17,8 @@ import java.util.*
 @Service
 @Transactional(readOnly = true)
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
 ) : UserUseCase {
 
     @Transactional
@@ -28,10 +30,13 @@ class UserService(
             throw DuplicateEntityException("User", "nickname", command.nickname)
         }
 
+        val encodedPassword = passwordEncoder.encode(command.password)
+            ?: throw IllegalStateException("Password encoding failed")
+
         val user = User(
             email = command.email,
             nickname = command.nickname,
-            password = command.password // TODO: 암호화 필요
+            password = encodedPassword
         )
 
         val savedUser = userRepository.save(user)

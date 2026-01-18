@@ -8,6 +8,7 @@ import com.gotchan.domain.user.model.User
 import com.gotchan.domain.user.port.UserRepository
 import com.gotchan.fixture.UserFixture
 import org.assertj.core.api.Assertions.assertThat
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -28,11 +29,14 @@ class UserServiceTest {
     @Mock
     lateinit var userRepository: UserRepository
 
+    @Mock
+    lateinit var passwordEncoder: PasswordEncoder
+
     lateinit var userService: UserService
 
     @BeforeEach
     fun setUp() {
-        userService = UserService(userRepository)
+        userService = UserService(userRepository, passwordEncoder)
     }
 
     @Nested
@@ -49,6 +53,7 @@ class UserServiceTest {
             )
             given(userRepository.existsByEmail(command.email)).willReturn(false)
             given(userRepository.existsByNickname(command.nickname)).willReturn(false)
+            given(passwordEncoder.encode(command.password)).willReturn("encodedPassword")
             given(userRepository.save(any<User>())).willAnswer { it.arguments[0] as User }
 
             // When
