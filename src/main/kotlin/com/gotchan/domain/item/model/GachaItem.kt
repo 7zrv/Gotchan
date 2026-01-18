@@ -35,26 +35,20 @@ class GachaItem(
 
 ) : BaseEntity() {
 
-    fun isAvailable(): Boolean = status == ItemStatus.AVAILABLE
+    fun isAvailable() = status == ItemStatus.AVAILABLE
 
     fun startTrading() {
-        if (status != ItemStatus.AVAILABLE) {
-            throw InvalidStateException("Item is not available for trading")
-        }
+        validateStatusTransition(ItemStatus.AVAILABLE, ItemStatus.TRADING)
         status = ItemStatus.TRADING
     }
 
     fun cancelTrading() {
-        if (status != ItemStatus.TRADING) {
-            throw InvalidStateException("Item is not in trading status")
-        }
+        validateStatusTransition(ItemStatus.TRADING, ItemStatus.AVAILABLE)
         status = ItemStatus.AVAILABLE
     }
 
     fun completeTrading() {
-        if (status != ItemStatus.TRADING) {
-            throw InvalidStateException("Item is not in trading status")
-        }
+        validateStatusTransition(ItemStatus.TRADING, ItemStatus.COMPLETED)
         status = ItemStatus.COMPLETED
     }
 
@@ -65,6 +59,12 @@ class GachaItem(
         this.seriesName = seriesName
         this.itemName = itemName
         this.imageUrl = imageUrl
+    }
+
+    private fun validateStatusTransition(from: ItemStatus, to: ItemStatus) {
+        if (status != from) {
+            throw InvalidStateException("Cannot transition from $status to $to")
+        }
     }
 }
 

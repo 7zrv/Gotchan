@@ -65,9 +65,7 @@ class Trade(
     }
 
     fun registerProposerTracking(trackingNumber: String) {
-        if (status != TradeStatus.ACCEPTED && status != TradeStatus.SHIPPING) {
-            throw InvalidStateException("Cannot register tracking number in current status")
-        }
+        validateTrackingRegistration()
         this.proposerTrackingNumber = trackingNumber
         if (status == TradeStatus.ACCEPTED) {
             startShipping()
@@ -75,9 +73,7 @@ class Trade(
     }
 
     fun registerReceiverTracking(trackingNumber: String) {
-        if (status != TradeStatus.ACCEPTED && status != TradeStatus.SHIPPING) {
-            throw InvalidStateException("Cannot register tracking number in current status")
-        }
+        validateTrackingRegistration()
         this.receiverTrackingNumber = trackingNumber
         if (status == TradeStatus.ACCEPTED) {
             startShipping()
@@ -85,19 +81,27 @@ class Trade(
     }
 
     fun confirmByProposer() {
-        if (status != TradeStatus.SHIPPING) {
-            throw InvalidStateException("Cannot confirm in current status")
-        }
+        validateConfirmation()
         proposerConfirmed = true
         checkAndFinish()
     }
 
     fun confirmByReceiver() {
+        validateConfirmation()
+        receiverConfirmed = true
+        checkAndFinish()
+    }
+
+    private fun validateTrackingRegistration() {
+        if (status != TradeStatus.ACCEPTED && status != TradeStatus.SHIPPING) {
+            throw InvalidStateException("Cannot register tracking number in current status")
+        }
+    }
+
+    private fun validateConfirmation() {
         if (status != TradeStatus.SHIPPING) {
             throw InvalidStateException("Cannot confirm in current status")
         }
-        receiverConfirmed = true
-        checkAndFinish()
     }
 
     private fun checkAndFinish() {

@@ -61,6 +61,10 @@ class TradeQueryRepository(
     fun findByStatus(status: TradeStatus): List<Trade> {
         return queryFactory
             .selectFrom(trade)
+            .leftJoin(trade.proposer, proposer).fetchJoin()
+            .leftJoin(trade.receiver, receiver).fetchJoin()
+            .leftJoin(trade.proposerItem, proposerItem).fetchJoin()
+            .leftJoin(trade.receiverItem, receiverItem).fetchJoin()
             .where(trade.status.eq(status))
             .orderBy(trade.createdAt.desc())
             .fetch()
@@ -84,17 +88,5 @@ class TradeQueryRepository(
                 trade.status.`in`(statuses)
             )
             .fetchFirst() != null
-    }
-
-    fun findByUserIdAndStatus(userId: UUID, status: TradeStatus): List<Trade> {
-        return queryFactory
-            .selectFrom(trade)
-            .where(
-                trade.proposer.id.eq(userId)
-                    .or(trade.receiver.id.eq(userId)),
-                trade.status.eq(status)
-            )
-            .orderBy(trade.createdAt.desc())
-            .fetch()
     }
 }
