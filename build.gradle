@@ -58,6 +58,7 @@ dependencies {
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testImplementation 'org.mockito.kotlin:mockito-kotlin:5.4.0'
     testImplementation 'io.mockk:mockk:1.13.13'
@@ -78,4 +79,21 @@ allOpen {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// KAPT 설정
+kapt {
+    correctErrorTypes = true
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask).configureEach {
+    if (name.contains('Test')) {
+        enabled = false
+    }
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask).configureEach {
+    if (name.contains('Test')) {
+        enabled = false
+    }
 }
