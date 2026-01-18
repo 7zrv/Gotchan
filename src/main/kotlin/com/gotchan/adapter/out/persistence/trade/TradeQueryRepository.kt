@@ -1,8 +1,10 @@
 package com.gotchan.adapter.out.persistence.trade
 
+import com.gotchan.domain.item.model.QGachaItem
 import com.gotchan.domain.trade.model.QTrade
 import com.gotchan.domain.trade.model.Trade
 import com.gotchan.domain.trade.model.TradeStatus
+import com.gotchan.domain.user.model.QUser
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
 import java.util.*
@@ -12,10 +14,18 @@ class TradeQueryRepository(
     private val queryFactory: JPAQueryFactory
 ) {
     private val trade = QTrade.trade
+    private val proposer = QUser("proposer")
+    private val receiver = QUser("receiver")
+    private val proposerItem = QGachaItem("proposerItem")
+    private val receiverItem = QGachaItem("receiverItem")
 
     fun findByProposerId(proposerId: UUID): List<Trade> {
         return queryFactory
             .selectFrom(trade)
+            .leftJoin(trade.proposer, proposer).fetchJoin()
+            .leftJoin(trade.receiver, receiver).fetchJoin()
+            .leftJoin(trade.proposerItem, proposerItem).fetchJoin()
+            .leftJoin(trade.receiverItem, receiverItem).fetchJoin()
             .where(trade.proposer.id.eq(proposerId))
             .orderBy(trade.createdAt.desc())
             .fetch()
@@ -24,6 +34,10 @@ class TradeQueryRepository(
     fun findByReceiverId(receiverId: UUID): List<Trade> {
         return queryFactory
             .selectFrom(trade)
+            .leftJoin(trade.proposer, proposer).fetchJoin()
+            .leftJoin(trade.receiver, receiver).fetchJoin()
+            .leftJoin(trade.proposerItem, proposerItem).fetchJoin()
+            .leftJoin(trade.receiverItem, receiverItem).fetchJoin()
             .where(trade.receiver.id.eq(receiverId))
             .orderBy(trade.createdAt.desc())
             .fetch()
@@ -32,6 +46,10 @@ class TradeQueryRepository(
     fun findByProposerIdOrReceiverId(userId: UUID): List<Trade> {
         return queryFactory
             .selectFrom(trade)
+            .leftJoin(trade.proposer, proposer).fetchJoin()
+            .leftJoin(trade.receiver, receiver).fetchJoin()
+            .leftJoin(trade.proposerItem, proposerItem).fetchJoin()
+            .leftJoin(trade.receiverItem, receiverItem).fetchJoin()
             .where(
                 trade.proposer.id.eq(userId)
                     .or(trade.receiver.id.eq(userId))

@@ -4,6 +4,7 @@ import com.gotchan.domain.item.model.GachaItem
 import com.gotchan.domain.item.model.ItemStatus
 import com.gotchan.domain.item.model.ItemType
 import com.gotchan.domain.item.model.QGachaItem
+import com.gotchan.domain.user.model.QUser
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
 import java.util.*
@@ -13,10 +14,12 @@ class ItemQueryRepository(
     private val queryFactory: JPAQueryFactory
 ) {
     private val item = QGachaItem.gachaItem
+    private val owner = QUser.user
 
     fun findByOwnerId(ownerId: UUID): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(item.owner.id.eq(ownerId))
             .orderBy(item.createdAt.desc())
             .fetch()
@@ -25,6 +28,7 @@ class ItemQueryRepository(
     fun findByOwnerIdAndType(ownerId: UUID, type: ItemType): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(
                 item.owner.id.eq(ownerId),
                 item.type.eq(type)
@@ -36,6 +40,7 @@ class ItemQueryRepository(
     fun findBySeriesName(seriesName: String): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(item.seriesName.eq(seriesName))
             .orderBy(item.createdAt.desc())
             .fetch()
@@ -44,6 +49,7 @@ class ItemQueryRepository(
     fun findBySeriesNameAndStatus(seriesName: String, status: ItemStatus): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(
                 item.seriesName.eq(seriesName),
                 item.status.eq(status)
@@ -55,6 +61,7 @@ class ItemQueryRepository(
     fun findAvailableByTypeAndSeriesName(type: ItemType, seriesName: String): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(
                 item.type.eq(type),
                 item.seriesName.eq(seriesName),
@@ -71,6 +78,7 @@ class ItemQueryRepository(
     ): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(
                 item.type.eq(type),
                 item.seriesName.eq(seriesName),
@@ -84,6 +92,7 @@ class ItemQueryRepository(
     fun searchByKeyword(keyword: String): List<GachaItem> {
         return queryFactory
             .selectFrom(item)
+            .leftJoin(item.owner, owner).fetchJoin()
             .where(
                 item.seriesName.containsIgnoreCase(keyword)
                     .or(item.itemName.containsIgnoreCase(keyword))

@@ -62,10 +62,7 @@ class ItemService(
 
         validateOwnership(item, command.requesterId)
 
-        if (!item.isAvailable()) {
-            throw InvalidStateException("Cannot update item that is not available")
-        }
-
+        // 도메인 모델(GachaItem.updateInfo)에서 상태 검증 수행
         item.updateInfo(
             seriesName = command.seriesName ?: item.seriesName,
             itemName = command.itemName ?: item.itemName,
@@ -82,12 +79,15 @@ class ItemService(
             ?: throw EntityNotFoundException("Item", command.itemId)
 
         validateOwnership(item, command.requesterId)
+        validateDeletable(item)
 
+        itemRepository.delete(item)
+    }
+
+    private fun validateDeletable(item: GachaItem) {
         if (!item.isAvailable()) {
             throw InvalidStateException("Cannot delete item that is not available")
         }
-
-        itemRepository.delete(item)
     }
 
     private fun validateOwnership(item: GachaItem, requesterId: UUID) {

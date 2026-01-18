@@ -2,6 +2,8 @@ package com.gotchan.adapter.`in`.web.user
 
 import com.gotchan.adapter.`in`.web.user.dto.SignUpRequest
 import com.gotchan.adapter.`in`.web.user.dto.UpdateUserRequest
+import com.gotchan.application.user.dto.UserProfileResponse
+import com.gotchan.application.user.dto.UserResponse
 import com.gotchan.application.user.port.UserUseCase
 import com.gotchan.common.response.ApiResponse
 import jakarta.validation.Valid
@@ -17,14 +19,14 @@ class UserController(
 ) {
 
     @PostMapping("/signup")
-    fun signUp(@Valid @RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<Any>> {
+    fun signUp(@Valid @RequestBody request: SignUpRequest): ResponseEntity<ApiResponse<UserResponse>> {
         val response = userUseCase.signUp(request.toCommand())
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(response))
     }
 
     @GetMapping("/{userId}/profile")
-    fun getProfile(@PathVariable userId: UUID): ResponseEntity<ApiResponse<Any>> {
+    fun getProfile(@PathVariable userId: UUID): ResponseEntity<ApiResponse<UserProfileResponse>> {
         val response = userUseCase.getProfile(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
@@ -33,7 +35,7 @@ class UserController(
     fun updateUser(
         @PathVariable userId: UUID,
         @Valid @RequestBody request: UpdateUserRequest
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<UserProfileResponse>> {
         val response = userUseCase.updateUser(request.toCommand(userId))
         return ResponseEntity.ok(ApiResponse.success(response))
     }

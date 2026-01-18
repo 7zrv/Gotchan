@@ -3,6 +3,7 @@ package com.gotchan.adapter.`in`.web.item
 import com.gotchan.adapter.`in`.web.item.dto.CreateItemRequest
 import com.gotchan.adapter.`in`.web.item.dto.UpdateItemRequest
 import com.gotchan.application.item.dto.DeleteItemCommand
+import com.gotchan.application.item.dto.ItemResponse
 import com.gotchan.application.item.port.ItemUseCase
 import com.gotchan.common.response.ApiResponse
 import jakarta.validation.Valid
@@ -21,26 +22,26 @@ class ItemController(
     fun createItem(
         @PathVariable userId: UUID,
         @Valid @RequestBody request: CreateItemRequest
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<ItemResponse>> {
         val response = itemUseCase.createItem(request.toCommand(userId))
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.success(response))
     }
 
     @GetMapping("/items/{itemId}")
-    fun getItem(@PathVariable itemId: Long): ResponseEntity<ApiResponse<Any>> {
+    fun getItem(@PathVariable itemId: Long): ResponseEntity<ApiResponse<ItemResponse>> {
         val response = itemUseCase.getItem(itemId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
     @GetMapping("/users/{userId}/items")
-    fun getItemsByOwner(@PathVariable userId: UUID): ResponseEntity<ApiResponse<Any>> {
+    fun getItemsByOwner(@PathVariable userId: UUID): ResponseEntity<ApiResponse<List<ItemResponse>>> {
         val response = itemUseCase.getItemsByOwner(userId)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
 
     @GetMapping("/items/search")
-    fun searchItems(@RequestParam seriesName: String): ResponseEntity<ApiResponse<Any>> {
+    fun searchItems(@RequestParam seriesName: String): ResponseEntity<ApiResponse<List<ItemResponse>>> {
         val response = itemUseCase.searchBySeries(seriesName)
         return ResponseEntity.ok(ApiResponse.success(response))
     }
@@ -50,7 +51,7 @@ class ItemController(
         @PathVariable userId: UUID,
         @PathVariable itemId: Long,
         @Valid @RequestBody request: UpdateItemRequest
-    ): ResponseEntity<ApiResponse<Any>> {
+    ): ResponseEntity<ApiResponse<ItemResponse>> {
         val response = itemUseCase.updateItem(request.toCommand(itemId, userId))
         return ResponseEntity.ok(ApiResponse.success(response))
     }
